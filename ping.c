@@ -88,7 +88,7 @@ int create_pack(int pack_no,pid_t self_pid,char *snbuf)
 void send_packet(pid_t self_pid) 
 {
 	char snbuf[PACKET_SIZE] = {'\0'};
-	
+
 	nsend++; 
 	int packetsize = create_pack(nsend,self_pid,snbuf);
 	if(sendto(sockfd,snbuf,packetsize,0,(struct sockaddr *)&dest_addr,sizeof(dest_addr)) < 0)
@@ -97,31 +97,31 @@ void send_packet(pid_t self_pid)
 
 int parsing_ping_package(char *buf,int len,pid_t self_pid,struct sockaddr_in from) 
 { 
-    int i,iphdrlen; 
-    struct ip *ip; 
-    struct icmp *icmp; 
-    struct timeval *tvsend; 
-    double rtt; 
-    ip = (struct ip *)buf; 
-    iphdrlen = ip->ip_hl << 2;
-    icmp = (struct icmp *)(buf + iphdrlen);
-    len -= iphdrlen;
-    
-    if(len < sizeof(struct icmp))
-    { 
-      err_msg("ICMP packets\'s length is less than icmp header\n"); 
-      return -1; 
-    } 
-    
-    if( (icmp->icmp_type == ICMP_ECHOREPLY) && (icmp->icmp_id == self_pid) ) 
-    { 
-        tvsend=(struct timeval *)icmp->icmp_data;
-        tv_sub(&tvrecv,tvsend);
-        rtt = tvrecv.tv_sec * 1000 + tvrecv.tv_usec/1000.0;
-        printf("%d byte from %s: icmp_seq=%u ttl=%d rtt=%.3f ms\n", len,inet_ntoa(from.sin_addr),icmp->icmp_seq,ip->ip_ttl,rtt); 
-        return 0;
-    } 
-    return -1; 
+	int i,iphdrlen; 
+	struct ip *ip; 
+	struct icmp *icmp; 
+	struct timeval *tvsend; 
+	double rtt; 
+	ip = (struct ip *)buf; 
+	iphdrlen = ip->ip_hl << 2;
+	icmp = (struct icmp *)(buf + iphdrlen);
+	len -= iphdrlen;
+
+	if(len < sizeof(struct icmp))
+	{ 
+		err_msg("ICMP packets\'s length is less than icmp header\n"); 
+		return -1; 
+	} 
+
+	if( (icmp->icmp_type == ICMP_ECHOREPLY) && (icmp->icmp_id == self_pid) ) 
+	{ 
+		tvsend=(struct timeval *)icmp->icmp_data;
+		tv_sub(&tvrecv,tvsend);
+		rtt = tvrecv.tv_sec * 1000 + tvrecv.tv_usec/1000.0;
+		printf("%d byte from %s: icmp_seq=%u ttl=%d rtt=%.3f ms\n", len,inet_ntoa(from.sin_addr),icmp->icmp_seq,ip->ip_ttl,rtt); 
+		return 0;
+	} 
+	return -1; 
 } 
 
 
@@ -132,7 +132,7 @@ void recv_packet(pid_t self_pid)
 	char rcvebuf[PACKET_SIZE];
 	fromlen = sizeof(struct sockaddr_in);
 	struct sockaddr_in from;
-	
+
 	while(1)
 	{
 		memset(rcvebuf,0,sizeof(rcvebuf));
@@ -194,7 +194,7 @@ int main(int argc,char *argv[])
 			err_sys("gethostbyname failed");
 		memcpy( (char *)&dest_addr.sin_addr.s_addr,host->h_addr,host->h_length); 
 		printf("PING %s (%s): %d bytes data in ICMP packets.\n",host->h_name, 
-		inet_ntoa(dest_addr.sin_addr),datalen); 
+				inet_ntoa(dest_addr.sin_addr),datalen); 
 	}
 	else
 	{
